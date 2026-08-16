@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /
+
+# This is a development / concept site. Indexing is intentionally disabled.
+# Set Allow: / and remove the X-Robots-Tag noindex header (public/_headers)
+# once the site is approved for public launch.

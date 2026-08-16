@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Values from '../components/Values.astro';
+import About from '../components/About.astro';
+import Programs from '../components/Programs.astro';
+import Gallery from '../components/Gallery.astro';
+import TrySection from '../components/TrySection.astro';
+import JoinCTA from '../components/JoinCTA.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <div class="topline">Eagles Roller Sports Club <span>★</span> Speed Skate Branch <span>★</span> Inline speed skating</div>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Values />
+    <About />
+    <Programs />
+    <Gallery />
+    <TrySection />
+    <JoinCTA />
+  </main>
+  <Footer />
+</BaseLayout>
