@@ -1,0 +1,27 @@
+---
+import { NAV, SITE } from '../lib/site';
+---
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <a class="brand" href="#top" aria-label="Back to top">
+          <img src="/eagles-mark-white.png" alt="" width="112" height="54" />
+          <span class="brand-copy">Eagles<small>Speed Skate</small></span>
+        </a>
+        <p>Inline speed skating branch of {SITE.club}.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        {NAV.map((item) => (
+          <a href={item.href}>{item.label}</a>
+        ))}
+        <a href={SITE.mainClubUrl} target="_blank" rel="noopener noreferrer">Main club ↗</a>
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <span>© {SITE.club}. Website concept.</span>
+      <span>Teamwork ★ Respect ★ Discipline ★ Fun</span>
+    </div>
+  </div>
+</footer>

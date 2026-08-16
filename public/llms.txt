@@ -1,0 +1,14 @@
+# Eagles Speed Skate — llms.txt
+
+Eagles Speed Skate is the inline speed skating branch of Eagles Roller Sports Club.
+This is a development / concept website.
+
+- Inline speed skating (not ice speed skating)
+- Programs: Learn to speed skate, Develop your race, Race with Eagles
+- Come and try: bring your own helmet (required) and be a Skate Australia member.
+  Not a member? A free three-week trial is available at
+  https://www.skateaustralia.org.au/three-weekfreetrial
+
+Club schedules, locations, contact details and registration links are pending club approval
+and are intentionally not published on this concept site. Visit the main club site at
+https://eaglesrollersports.com.au for current information.

@@ -1,0 +1,55 @@
+---
+import { SITE } from '../lib/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+}
+
+const {
+  title = 'Eagles Speed Skate — Inline Racing',
+  description = SITE.description,
+  path = '/',
+} = Astro.props;
+
+const canonical = new URL(path, Astro.site ?? 'https://eagles.wallywebdev.xyz').href;
+const ogImage = new URL('/eagles-mark.png', Astro.site ?? 'https://eagles.wallywebdev.xyz').href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsTeam',
+  name: SITE.name,
+  description: SITE.description,
+  sport: 'Inline speed skating',
+  parentOrganization: { '@type': 'SportsTeam', name: SITE.club },
+  url: canonical,
+};
+---
+
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#061a43" />
+    <link rel="icon" href="/eagles-mark.png" type="image/png" />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

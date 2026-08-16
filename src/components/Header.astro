@@ -1,0 +1,18 @@
+---
+import { NAV, SITE } from '../lib/site';
+---
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label={`${SITE.name} home`}>
+      <img src="/eagles-mark.png" alt="" width="112" height="54" />
+      <span class="brand-copy">Eagles<small>Speed Skate</small></span>
+    </a>
+    <nav class="links" aria-label="Main navigation">
+      {NAV.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+      <a class="button" href="#join">Join the squad</a>
+    </nav>
+  </div>
+</header>
