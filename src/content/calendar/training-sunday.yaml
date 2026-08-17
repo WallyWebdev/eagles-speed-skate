@@ -1,0 +1,11 @@
+title: Sunday training session
+category: training
+recurrence:
+  freq: weekly
+  days: [Sun]
+  from: '2026-08-16'
+time: '12:00'
+endTime: '13:00'
+info: >-
+  Open to club members. Bring your own helmet (required to skate) and be a
+  Skate Australia member. New skaters welcome at come-and-try sessions.

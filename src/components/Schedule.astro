@@ -1,0 +1,178 @@
+---
+import { getCollection } from 'astro:content';
+import EventCard from './EventCard.astro';
+import {
+  expandAll,
+  groupByMonth,
+  monthKey,
+  monthLabel,
+  buildMonthGrid,
+  CATEGORY_META,
+  type CalendarEntry,
+  type Occurrence,
+  type Category,
+} from '../lib/calendar';
+
+const entries = (await getCollection('calendar')).map((c) => ({
+  id: c.id,
+  ...c.data,
+})) as CalendarEntry[];
+
+// Build-time "today". Occurrences are expanded from now to 6 months out.
+// The site rebuilds on every git push (Cloudflare Pages), so this stays current.
+const now = new Date();
+const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const horizon = new Date(now.getFullYear(), now.getMonth() + 6, 1);
+
+const occurrences = expandAll(entries, horizon).filter((o) => o.date >= today);
+const groups = groupByMonth(occurrences);
+
+// Two-month calendar strip (current + next), rendered server-side.
+const monthDefs = [0, 1].map((offset) => {
+  const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  return {
+    key: monthKey(base),
+    label: monthLabel(monthKey(base)),
+    cells: buildMonthGrid(base.getFullYear(), base.getMonth()),
+  };
+});
+
+const occByDate = new Map<string, Occurrence[]>();
+for (const o of occurrences) {
+  const k = `${o.date.getFullYear()}-${String(o.date.getMonth() + 1).padStart(2, '0')}-${String(
+    o.date.getDate(),
+  ).padStart(2, '0')}`;
+  if (!occByDate.has(k)) occByDate.set(k, []);
+  occByDate.get(k)!.push(o);
+}
+
+const categories: Category[] = ['training', 'local', 'state', 'national', 'international'];
+
+function dateKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate(),
+  ).padStart(2, '0')}`;
+}
+---
+
+<section class="schedule section" id="schedule">
+  <div class="wrap">
+    <div class="schedule-head">
+      <div>
+        <div class="eyebrow">On the calendar</div>
+        <h2 class="section-heading">Training &amp; race schedule</h2>
+      </div>
+      <p class="intro">
+        Sunday training plus local, state, national and international events of interest to
+        members. Filter by type, or scan the month view.
+      </p>
+    </div>
+
+    <div class="cal-filters" role="group" aria-label="Filter events by type" data-cal-filters>
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      {
+        categories.map((c) => (
+          <button type="button" data-filter={c} aria-pressed="false" class={`cal-filters__btn--${c}`}>
+            {CATEGORY_META[c].label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="cal-layout">
+      <div class="cal-list">
+        {
+          groups.length === 0 && (
+            <p class="cal-empty">No events scheduled yet — check back soon.</p>
+          )
+        }
+        {
+          groups.map(([key, occs]) => (
+            <div class="cal-month">
+              <h3 class="cal-month__label">{monthLabel(key)}</h3>
+              <div class="cal-cards">
+                {occs.map((occ) => (
+                  <EventCard occ={occ} />
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <aside class="cal-strip" aria-label="Month calendar">
+        {
+          monthDefs.map((m) => (
+            <div class="cal-mini">
+              <h3 class="cal-mini__label">{m.label}</h3>
+              <div class="cal-mini__grid" role="grid">
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+                  <span class="cal-mini__dow" role="columnheader">
+                    {d}
+                  </span>
+                ))}
+                {m.cells.map((cell) => {
+                  const k = dateKey(cell.date);
+                  const dayOcc = occByDate.get(k) ?? [];
+                  return (
+                    <div
+                      class:list={[
+                        'cal-mini__cell',
+                        { 'cal-mini__cell--out': !cell.inMonth },
+                        { 'cal-mini__cell--has': dayOcc.length > 0 },
+                      ]}
+                      role="gridcell"
+                    >
+                      <span class="cal-mini__num">{cell.date.getDate()}</span>
+                      {dayOcc.length > 0 && (
+                        <span class="cal-mini__dots">
+                          {dayOcc.slice(0, 3).map((o) => (
+                            <span
+                              class={`cal-dot cal-dot--${o.category}`}
+                              data-cal-dot={o.category}
+                              title={o.title}
+                            />
+                          ))}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        }
+        <ul class="cal-legend">
+          {
+            categories.map((c) => (
+              <li class="cal-legend__item">
+                <span class={`cal-dot cal-dot--${c}`} /> {CATEGORY_META[c].label}
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  const bar = document.querySelector('[data-cal-filters]');
+  if (bar) {
+    const cards = Array.from(document.querySelectorAll('[data-cal-card]'));
+    const dots = Array.from(document.querySelectorAll('[data-cal-dot]'));
+    const apply = (active) => {
+      const set = active === 'all' ? null : new Set(active.split(',').filter(Boolean));
+      for (const el of cards) el.hidden = set ? !set.has(el.getAttribute('data-cal-card')) : false;
+      for (const el of dots) el.hidden = set ? !set.has(el.getAttribute('data-cal-dot')) : false;
+      bar.querySelectorAll('button').forEach((b) => {
+        b.setAttribute('aria-pressed', String(active === b.getAttribute('data-filter')));
+      });
+    };
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (btn) apply(btn.getAttribute('data-filter'));
+    });
+    apply('all');
+  }
+</script>

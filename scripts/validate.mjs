@@ -46,7 +46,7 @@ check('JSON-LD SportsTeam present', /"@type"\s*:\s*"SportsTeam"/.test(html));
 
 // 3. Internal anchors resolve to real section ids
 const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]));
-for (const id of ['top', 'about', 'programs', 'gallery', 'try', 'join']) {
+for (const id of ['top', 'about', 'programs', 'gallery', 'schedule', 'try', 'join']) {
   check(`section id #${id} exists`, ids.has(id));
 }
 
