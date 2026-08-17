@@ -1,0 +1,39 @@
+---
+import { formatTime, CATEGORY_META, type Occurrence } from '../lib/calendar';
+
+interface Props {
+  occ: Occurrence;
+}
+const { occ } = Astro.props;
+const meta = CATEGORY_META[occ.category];
+const timeText = occ.time
+  ? `${formatTime(occ.time)}${occ.endTime ? ` – ${formatTime(occ.endTime)}` : ''}`
+  : 'Time TBC';
+const dow = occ.date.toLocaleDateString('en-AU', { weekday: 'short' });
+const dayNum = occ.date.getDate();
+const mon = occ.date.toLocaleDateString('en-AU', { month: 'short' });
+---
+
+<article class="cal-card" data-cal-card={occ.category}>
+  <div class="cal-card__date" aria-hidden="true">
+    <span class="cal-card__dow">{dow}</span>
+    <span class="cal-card__day">{dayNum}</span>
+    <span class="cal-card__mon">{mon}</span>
+  </div>
+  <div class="cal-card__body">
+    <span class="cal-badge cal-badge--{occ.category}">{meta.label}</span>
+    <h3 class="cal-card__title">{occ.title}</h3>
+    <p class="cal-card__meta">
+      <span class="cal-card__time">{timeText}</span>
+      {occ.location && <span class="cal-card__loc">{occ.location}</span>}
+    </p>
+    {occ.info && <p class="cal-card__info">{occ.info}</p>}
+    {
+      occ.url && (
+        <a class="cal-card__link" href={occ.url} target="_blank" rel="noopener noreferrer">
+          Event info <span aria-hidden="true">↗</span>
+        </a>
+      )
+    }
+  </div>
+</article>
